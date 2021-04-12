@@ -1,12 +1,18 @@
-        //.set    eta,            0.2         // learning rate
         .set    maxin,          14          // number of input nodes
         .set    maxout,         26          // number of nodes output layer
         .set    n_iterations,   2000        // times to train the network
         .set    numfv,          78          // number of feature vectors total
         .set    numuv,          78          // number of test vectors
         .set    log_mod,        100         // print every log_mod iterations
+
 ////////////////////////////////////////////////////////////////////////////////
 
+        .data
+eta:    .double 0.2
+
+////////////////////////////////////////////////////////////////////////////////
+
+        .text
         .global update_weights
         .type   update_weights, %function // void update_weights( double x[],
         // double o_out[], int desired[], double w[maxout][maxin+1]);
@@ -34,7 +40,7 @@ forall_rows_of_weights:
         mul     x6, x4, x6
         add     x6, x3, x6, lsl 3           // ***** MUST INDEX CORRECTLY *****
 forall_weights_in_row:
-        fmov    d1, .25                     // use .25 for small enough value at operand2
+        ldr     d1, eta
         fmul    d0, d0, d1
         ldr     d2, [x0, x5, lsl 3]
         ldr     d1, [x6, x5, lsl 3]         // load w[i][j]

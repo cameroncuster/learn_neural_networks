@@ -30,7 +30,9 @@ forall_rows_of_weights:
         // d0 is delta[i]
         mov     x5, 0                       // j = 0
         //ldr     x6, [x3, x4, lsl 3]         // load base address of weights row
-        add     x6, x3, x4, lsl 3
+        mov     x6, maxin
+        mul     x6, x4, x6
+        add     x6, x3, x6, lsl 3           // ***** MUST INDEX CORRECTLY *****
 forall_weights_in_row:
         fmov    d1, .25                     // use .25 for small enough value at operand2
         fmul    d0, d0, d1
@@ -43,8 +45,8 @@ forall_weights_in_row:
         add     x5, x5, 1
         ble     forall_weights_in_row       // for( ; j <= maxin; j++ )
 
-        cmp     x6, maxout
-        add     x6, x6, 1
+        cmp     x4, maxout
+        add     x4, x4, 1
         blt     forall_rows_of_weights      // for( ; i < maxout; i++ )
 
         ldp     x29, x30, [sp], 16

@@ -29,7 +29,8 @@ forall_rows_of_weights:
 
         // d0 is delta[i]
         mov     x5, 0                       // j = 0
-        ldr     x6, [x3, x4, lsl 3]         // load base address of weights row
+        //ldr     x6, [x3, x4, lsl 3]         // load base address of weights row
+        add     x6, x3, x4, lsl 3
 forall_weights_in_row:
         fmov    d1, .25                     // use .25 for small enough value at operand2
         fmul    d0, d0, d1

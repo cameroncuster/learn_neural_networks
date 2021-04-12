@@ -19,6 +19,13 @@ using namespace std;
 
 #define DEBUG false
 
+// AArch64 implementations
+extern "C" void update_weights_arm(double x[], double o_out[], int desired[],
+        double w[maxout][maxin+1]);
+extern "C" void network_response_arm(double x[maxin+1], double w[maxout][maxin+1],
+        double o_out[maxout]);
+
+
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 //              function classify                                 //
@@ -118,7 +125,6 @@ void test_vectors(double fv[][maxin+1], int numv,
   int fclass[], int desired[][maxout])
   {
   int     i;
-  int     j;
   int     net_guess;
   int     correct;
   double  o_out[maxout];
@@ -380,6 +386,7 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
     {
     for (i = 0; i < numfv; i++)
       {
+          // use arm versions
       network_response(fv[i], w, o_out);
       update_weights(fv[i], o_out, ftarget[i], w);
       }

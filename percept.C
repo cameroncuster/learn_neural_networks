@@ -18,12 +18,20 @@ using namespace std;
 #include "constant.h"
 
 #define DEBUG false
+#define USE_ARM_UPDATE_WEIGHTS false
+#define USE_ARM_NETWORK_RESPONSE false
 
 // AArch64 implementations
-extern "C" void update_weights_arm(double x[], double o_out[], int desired[],
+
+#if USE_ARM_UPDATE_WEIGHTS
+extern "C" void update_weights(double x[], double o_out[], int desired[],
         double w[maxout][maxin+1]);
-extern "C" void network_response_arm(double x[maxin+1], double w[maxout][maxin+1],
+#endif
+
+#if USE_ARM_NETWORK_RESPONSE
+extern "C" void network_response(double x[maxin+1], double w[maxout][maxin+1],
         double o_out[maxout]);
+#endif
 
 
 ////////////////////////////////////////////////////////////////////
@@ -87,6 +95,7 @@ void make_expected(int fclass[], int n, int target[][maxout])
 //   Called By : train                                            //
 //               test_uniform                                     //
 ////////////////////////////////////////////////////////////////////
+#if ( USE_ARM_NETWORK_RESPONSE == false )
 void network_response (double x[maxin+1], double w[maxout][maxin+1], 
                        double o_out[maxout])
   {
@@ -105,6 +114,7 @@ void network_response (double x[maxin+1], double w[maxout][maxin+1],
     }
 
   }
+#endif
   // network_response
 
 
@@ -296,6 +306,7 @@ void print_weights(double w[maxout][maxin+1])
 //                                                                //
 //   Called By : train                                            //
 ////////////////////////////////////////////////////////////////////
+#if ( USE_ARM_UPDATE_WEIGHTS == false )
 void update_weights(double x[], double o_out[], int desired[],
                     double w[maxout][maxin+1])
   {
@@ -316,6 +327,7 @@ void update_weights(double x[], double o_out[], int desired[],
       }
     }
    }
+#endif
   // update_weights
 
 ////////////////////////////////////////////////////////////////////

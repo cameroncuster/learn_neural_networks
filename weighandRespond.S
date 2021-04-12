@@ -7,10 +7,10 @@
         .set    log_mod,        100         // print every log_mod iterations
 ////////////////////////////////////////////////////////////////////////////////
 
-        .global update_weights_arm
-        .type   update_weights_arm, %function // void update_weights_arm(
-        // double x[], double o_out[], int desired[], double w[maxout][maxin+1]);
-update_weights_arm:
+        .global update_weights
+        .type   update_weights, %function // void update_weights( double x[],
+        // double o_out[], int desired[], double w[maxout][maxin+1]);
+update_weights:
         stp     x29, x30, [sp, -16]!
 
         mov     x4, 0                       // i = 0 *-> could be pre-shifted
@@ -49,16 +49,16 @@ forall_weights_in_row:
 
         ldp     x29, x30, [sp], 16
         ret
-        .size   update_weights_arm, (. - update_weights_arm)
+        .size   update_weights, (. - update_weights)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-        .global network_response_arm
-        .type   network_respones_arm, %function // void network_response_arm(
+        .global network_response
+        .type   network_respones, %function // void network_response(
         // double x[maxin+1], double w[maxout][maxin+1], double o_out[maxout]);
-network_response_arm:
+network_response:
         stp     x29, x30, [sp, -16]!
 
         ldp     x29, x30, [sp], 16
         ret
-        .size   network_response_arm, (. - network_response_arm)
+        .size   network_response, (. - network_response)

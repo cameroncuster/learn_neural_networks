@@ -18,8 +18,8 @@ using namespace std;
 #include "constant.h"
 
 #define DEBUG false
-#define USE_ARM_UPDATE_WEIGHTS false
-#define USE_ARM_NETWORK_RESPONSE false
+#define USE_ARM_UPDATE_WEIGHTS true
+#define USE_ARM_NETWORK_RESPONSE true
 
 // AArch64 implementations
 

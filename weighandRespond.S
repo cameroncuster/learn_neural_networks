@@ -38,10 +38,12 @@ forall_rows_of_weights:
         fmul    d2, d2, d3
         fmul    d0, d2, d0
 
+        // row address
         mov     x5, maxin
         mul     x5, x4, x5
         lsl     x5, x5, 3
         add     x6, x5, x3
+
         mov     x5, 0                       // j = 0
 
 forall_weights_in_row:

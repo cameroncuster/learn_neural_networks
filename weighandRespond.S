@@ -7,10 +7,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-        .data
+        .section .rodata
 eta:    .double 0.2
+        .align  3
 
 zero:   .double 0.0
+        .align  3
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -26,8 +28,8 @@ update_weights:
 forall_rows_of_weights:
         // load values
         ldr     d0, [x1, x4, lsl 3]         // f0 = o_out[i]
-        ldr     w1, [x2, x4, lsl 2]         // r1 = desired[i]
-        scvtf   d1, w1                      // f1 = r1
+        ldr     w5, [x2, x4, lsl 2]         // r5 = desired[i]
+        scvtf   d1, w5                      // f1 = r5
 
         ldr     d2, zero
         fsub    d2, d0, d2                  // f2 = -( o_out[i] - 1 ) = 1 - o_out[i]
@@ -40,15 +42,16 @@ forall_rows_of_weights:
         mov     x5, 0                       // j = 0
         mov     x6, maxin
         mul     x6, x4, x6
-        add     x6, x3, x6, lsl 3           // ***** MUST INDEX CORRECTLY *****
-        // increment address at each inner loop for w...
+        lsl     x6, x6, 3
+        add     x6, x3, x6
+
 forall_weights_in_row:
         ldr     d1, eta
-        fmul    d0, d0, d1
+        fmul    d1, d0, d1
         ldr     d2, [x0, x5, lsl 3]         // load x[j]
-        ldr     d1, [x6, x5, lsl 3]         // load w[i][j]
-        fmadd   d0, d0, d2, d1              // w[i][j] += eta * delta[i] * x[j]
-        str     d0, [x6, x5, lsl 3]         // store w[i][j]
+        ldr     d3, [x6, x5, lsl 3]         // load w[i][j]
+        fmadd   d1, d1, d2, d3              // w[i][j] += eta * delta[i] * x[j]
+        str     d1, [x6, x5, lsl 3]         // store w[i][j]
 
         add     x5, x5, 1
         cmp     x5, maxin

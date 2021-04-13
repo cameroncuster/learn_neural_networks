@@ -398,7 +398,6 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
     {
     for (i = 0; i < numfv; i++)
       {
-          // use arm versions
       network_response(fv[i], w, o_out);
       update_weights(fv[i], o_out, ftarget[i], w);
       }

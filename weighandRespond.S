@@ -50,12 +50,12 @@ forall_weights_in_row:
         fmadd   d0, d0, d2, d1              // w[i][j] += eta * delta[i] * x[j]
         str     d0, [x6, x5, lsl 3]         // store w[i][j]
 
-        cmp     x5, maxin
         add     x5, x5, 1
+        cmp     x5, maxin
         blt     forall_weights_in_row       // for( ; j < maxin + 1; j++ )
 
-        cmp     x4, maxout
         add     x4, x4, 1
+        cmp     x4, maxout
         blt     forall_rows_of_weights      // for( ; i < maxout; i++ )
 
         ldp     x29, x30, [sp], 16
@@ -91,8 +91,8 @@ forall_values_in_output_layer:
         ldr     d2, [x19, x5, lsl 3]        // x[j]
         fmsub   d8, d1, d2, d8              // temp -= w[i][j] * x[j]
 
-        cmp     x5, maxin
         add     x5, x5, 1
+        cmp     x5, maxin
         blt     forall_values_in_output_layer
 
         bl      exp
@@ -104,8 +104,8 @@ forall_values_in_output_layer:
 
         str     d8, [x21, x29, lsl 3]
 
-        cmp     x29, maxout
         add     x29, x29, 1
+        cmp     x29, maxout
         blt     forall_rows_in_output_layer
 
         ldp     d8, d9, [sp], 16

@@ -31,19 +31,18 @@ forall_rows_of_weights:
         ldr     w5, [x2, x4, lsl 2]         // r5 = desired[i]
         scvtf   d1, w5                      // f1 = r5
 
-        ldr     d2, zero
-        fsub    d2, d0, d2                  // f2 = -( o_out[i] - 1 ) = 1 - o_out[i]
-        fneg    d2, d2
-        fsub    d3, d1, d0                  // f3 = desired[i] - o_out[i]
-        fmul    d1, d2, d3                  // f1 = f2 * f3
-        fmul    d0, d2, d0                  // f0 = f2 * o_out[i] ( f0 )
+        // calculate delta into f0
+        fsub    d2, d1, d0
+        fmov    d3, 1.0
+        fsub    d3, d3, d0
+        fmul    d2, d2, d3
+        fmul    d0, d2, d0
 
-        // f0 is delta[i]
+        mov     x5, maxin
+        mul     x5, x4, x5
+        lsl     x5, x5, 3
+        add     x6, x5, x3
         mov     x5, 0                       // j = 0
-        mov     x6, maxin
-        mul     x6, x4, x6
-        lsl     x6, x6, 3
-        add     x6, x3, x6
 
 forall_weights_in_row:
         ldr     d1, eta

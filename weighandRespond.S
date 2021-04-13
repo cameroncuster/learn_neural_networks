@@ -25,7 +25,7 @@ update_weights:
 
 forall_rows_of_weights:
         // load values
-        //ldr     d0, [x1, x4, lsl 3]         // f0 = o_out[i]
+        ldr     d0, [x1, x4, lsl 3]         // f0 = o_out[i]
         ldr     w1, [x2, x4, lsl 2]         // r1 = desired[i]
         scvtf   d1, w1                      // f1 = r1
 
@@ -79,30 +79,32 @@ network_response:
 
         mov     x29, 0                      // i = 0
 forall_rows_in_output_layer:
-        mov     x5, 0                       // j = 0
-        mov     x6, maxin
-        mul     x6, x6, x29
-        add     x6, x20, x6, lsl 3          // r6 is the base address for j loop
+        mov     x0, 0                       // j = 0
+        mov     x1, maxin
+        mul     x1, x1, x29
+        lsl     x1, x1, 3
+        add     x1, x20, x1                 // r6 is the base address for j loop
 
         ldr     d8, zero                    // temp = 0
 
 forall_values_in_output_layer:
-        ldr     d1, [x6, x5, lsl 3]         // w[i][j]
-        ldr     d2, [x19, x5, lsl 3]        // x[j]
-        fmsub   d8, d1, d2, d8              // temp -= w[i][j] * x[j]
+        ldr     d0, [x1, x0, lsl 3]         // w[i][j]
+        ldr     d1, [x19, x0, lsl 3]        // x[j]
+        fmsub   d8, d0, d1, d8              // temp -= w[i][j] * x[j]
 
-        add     x5, x5, 1
-        cmp     x5, maxin
+        add     x0, x0, 1
+        cmp     x0, maxin
         blt     forall_values_in_output_layer
 
+        fmov    d0, d8
         bl      exp
 
         fmov    d1, 1.0
-        fadd    d8, d8, d1
+        fadd    d0, d0, d1
 
-        fdiv    d8, d1, d8
+        fdiv    d0, d1, d0
 
-        str     d8, [x21, x29, lsl 3]
+        str     d0, [x21, x29, lsl 3]
 
         add     x29, x29, 1
         cmp     x29, maxout

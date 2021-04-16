@@ -15,11 +15,13 @@ zero:   .double 0.0
         .align  3
 
 ////////////////////////////////////////////////////////////////////////////////
+//      Simple function to update the weights of first layer of the network   //
+////////////////////////////////////////////////////////////////////////////////
 
         .text
         .global update_weights
         .type   update_weights, %function // void update_weights( double x[],
-        // double o_out[], int desired[], double w[maxout][maxin+1]);
+        // double o_out[], int desired[], double w[maxout][maxin+1] )
 update_weights:
         stp     x29, x30, [sp, -16]!
 
@@ -67,10 +69,12 @@ forall_weights_in_row:
         .size   update_weights, (. - update_weights)
 
 ////////////////////////////////////////////////////////////////////////////////
+//      response function to generate output matrix o_out                     //
+////////////////////////////////////////////////////////////////////////////////
 
         .global network_response
         .type   network_respones, %function // void network_response(
-        // double x[maxin+1], double w[maxout][maxin+1], double o_out[maxout]);
+        // double x[maxin+1], double w[maxout][maxin+1], double o_out[maxout] )
 network_response:
         stp     x29, x30, [sp, -16]!
         stp     x21, x22, [sp, -16]!

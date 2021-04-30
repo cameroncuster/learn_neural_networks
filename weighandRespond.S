@@ -34,11 +34,9 @@ forall_rows_of_weights:
         scvtf   d1, w5                      // f1 = r5
 
         // calculate delta into f0
-        fsub    d2, d1, d0
-        fmov    d3, 1.0
-        fsub    d3, d3, d0
-        fmul    d2, d2, d3
-        fmul    d0, d2, d0
+        fmsub   d2, d0, d0, d0              // o_out - o_out^2
+        fsub    d3, d1, d0                  // desired - o_out
+        fmul    d0, d2, d3
 
         // row address
         mov     x5, maxin

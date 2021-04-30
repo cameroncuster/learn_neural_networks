@@ -104,13 +104,12 @@ network_response:
         mov     x20, x1                     // r20 = w[][]
         mov     x21, x2                     // r21 = o_out[]
 
+        mov     x22, shiftedMaxin           // const x22 = shiftedMaxin
+
         mov     x29, 0                      // i = 0
 forall_rows_in_output_layer:
         mov     x0, 0                       // j = 0
-        mov     x1, maxin
-        mul     x1, x1, x29
-        lsl     x1, x1, 3
-        add     x1, x20, x1                 // r6 is the base address for j loop
+        madd    x1, x22, x29, x20
 
         ldr     d8, zero                    // temp = 0
 

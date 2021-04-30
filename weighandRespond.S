@@ -24,7 +24,7 @@ zero:   .double 0.0
 //               PROCEDURE update_weights                         //
 //                                                                //
 //   First update the output weights then back up through         //
-//   the nodes.                                                   //
+//   the nodes. Highly optomized for speed-ups in update.         //
 //                                                                //
 //   Calls : none                                                 //
 //                                                                //
@@ -95,7 +95,8 @@ for_remaining_weights_in_row: // vectorize (SIMD)
 //                function network_response                       //
 //                                                                //
 //   Calculate the responses of the hidden layer and feed         //
-//   these into the output layer.                                 //
+//   these into the output layer. Highly optimized for speed-ups  //
+//   in response out layer.                                       //
 //                                                                //
 //   Calls : none                                                 //
 //                                                                //

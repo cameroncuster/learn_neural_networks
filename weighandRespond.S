@@ -64,10 +64,10 @@ forall_rows_of_weights:
 
         mov     x5, 0                       // j = 0
 
-        // copy addresses
+        // copy address
         mov     x10, x0
 
-forall_weights_in_row: // vectorize (SIMD)
+forall_weights_in_row:
         ld1     {v2.2d}, [x10], 16          // x[j] and x[j+1]
         ld1     {v3.2d}, [x6]               // w[i][j] and w[i][j+1]
 
@@ -82,7 +82,8 @@ forall_weights_in_row: // vectorize (SIMD)
         cmp     x5, maxinVec
         blt     forall_weights_in_row       // for( ; j < maxinVec; j += 2 )
 
-for_remaining_weights_in_row: // vectorize (SIMD)
+for_remaining_weights_in_row: /* slightly inefficient as it always computes the
+                                 last one/two values in the array individually */
         ldr     d2, [x10], 8                // x[j]
         ldr     d3, [x6]                    // w[i][j]
         fmadd   d1, d0, d2, d3              // w[i][j] += eta * delta[i] * x[j]

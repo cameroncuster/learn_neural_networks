@@ -1,4 +1,5 @@
         .set    maxin,          15          // number of input nodes + 1
+        .set    maxinVec,       13          // number of input nodes - 1
         .set    shiftedMaxin,   maxin * 8   // shift the maxin value
         .set    maxout,         26          // number of nodes output layer
         .set    n_iterations,   2000        // times to train the network
@@ -66,8 +67,18 @@ forall_weights_in_row: // vectorize (SIMD)
         str     d1, [x6, x5, lsl 3]         // store w[i][j]
 
         add     x5, x5, 1
+        cmp     x5, maxinVec
+        blt     forall_weights_in_row       // for( ; j < maxinVec; j++ )
+
+for_remaining_weights_in_row: // vectorize (SIMD)
+        ldr     d2, [x0, x5, lsl 3]         // x[j]
+        ldr     d3, [x6, x5, lsl 3]         // w[i][j]
+        fmadd   d1, d0, d2, d3              // w[i][j] += eta * delta[i] * x[j]
+        str     d1, [x6, x5, lsl 3]         // store w[i][j]
+
+        add     x5, x5, 1
         cmp     x5, maxin
-        blt     forall_weights_in_row       // for( ; j < maxin + 1; j++ )
+        blt     for_remaining_weights_in_row// for( ; j < maxin; j++ )
 
         add     x4, x4, 1
         cmp     x4, maxout

@@ -113,7 +113,7 @@ forall_rows_in_output_layer:
 
         ldr     d8, zero                    // temp = 0
 
-forall_values_in_output_layer:
+forall_values_in_output_layer: // vectorize (SIMD)
         // accumulate the product of the weights and the x values (negated)
         ldr     d0, [x1, x0, lsl 3]         // w[i][j]
         ldr     d1, [x19, x0, lsl 3]        // x[j]

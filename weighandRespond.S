@@ -48,10 +48,11 @@ forall_rows_of_weights:
         scvtf   d1, w5                      // f1 = r5
 
         // calculate delta into f0
-        fmsub   d2, d0, d0, d0
-        fsub    d3, d1, d0
-        fmul    d0, d2, d3
-        fmul    d0, d4, d0
+        fmsub   d2, d0, d0, d0      // expression 1 - ( o_out[i] - o_out[i]^2 )
+        fsub    d3, d1, d0          // expression 2 - ( desired[i] - o_out[i] )
+        fmul    d0, d2, d3          // product of 1 and 2
+        fmul    d0, d4, d0          /* delta = ( o_out[i] - o_out[i]^2 ) *
+                                        ( desired[i] - o_out[i] ) */
 
         // row address
         madd    x6, x4, x7, x3
@@ -59,8 +60,8 @@ forall_rows_of_weights:
         mov     x5, 0                       // j = 0
 
 forall_weights_in_row: // vectorize (SIMD)
-        ldr     d2, [x0, x5, lsl 3]
-        ldr     d3, [x6, x5, lsl 3]
+        ldr     d2, [x0, x5, lsl 3]         // x[j]
+        ldr     d3, [x6, x5, lsl 3]         // w[i][j]
         fmadd   d1, d0, d2, d3              // w[i][j] += eta * delta[i] * x[j]
         str     d1, [x6, x5, lsl 3]         // store w[i][j]
 
@@ -113,7 +114,7 @@ forall_rows_in_output_layer:
 
         ldr     d8, zero                    // temp = 0
 
-forall_values_in_output_layer: // vectorize (SIMD)
+forall_values_in_output_row: // vectorize (SIMD)
         // accumulate the product of the weights and the x values (negated)
         ldr     d0, [x1, x0, lsl 3]         // w[i][j]
         ldr     d1, [x19, x0, lsl 3]        // x[j]
@@ -121,7 +122,7 @@ forall_values_in_output_layer: // vectorize (SIMD)
 
         add     x0, x0, 1
         cmp     x0, maxin
-        blt     forall_values_in_output_layer// for( ; j < maxin; j++ )
+        blt     forall_values_in_output_row // for( ; j < maxin; j++ )
 
         // e^(-temp)
         fmov    d0, d8

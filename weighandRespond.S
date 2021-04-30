@@ -1,4 +1,5 @@
         .set    maxin,          15          // number of input nodes + 1
+        .set    shiftedMaxin,   maxin * 8   // shift the maxin value
         .set    maxout,         26          // number of nodes output layer
         .set    n_iterations,   2000        // times to train the network
         .set    numfv,          78          // number of feature vectors total
@@ -16,6 +17,7 @@ zero:   .double 0.0
 
 
 
+        .text
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 //               PROCEDURE update_weights                         //
@@ -28,12 +30,14 @@ zero:   .double 0.0
 //   Called By : train                                            //
 ////////////////////////////////////////////////////////////////////
 
-        .text
         .global update_weights
         .type   update_weights, %function // void update_weights( double x[],
         // double o_out[], int desired[], double w[maxout][maxin+1] )
 update_weights:
         stp     x29, x30, [sp, -16]!
+
+        ldr     d4, eta                     // const f4 = eta(0.2)
+        mov     x7, shiftedMaxin            // const r7 = shiftedMaxin
 
         mov     x4, 0                       // i = 0
 
@@ -47,21 +51,17 @@ forall_rows_of_weights:
         fmsub   d2, d0, d0, d0
         fsub    d3, d1, d0
         fmul    d0, d2, d3
+        fmul    d0, d4, d0
 
         // row address
-        mov     x5, maxin
-        mul     x5, x4, x5
-        lsl     x5, x5, 3
-        add     x6, x5, x3
+        madd    x6, x4, x7, x3
 
         mov     x5, 0                       // j = 0
 
-forall_weights_in_row:
-        ldr     d1, eta
-        fmul    d1, d0, d1
+forall_weights_in_row: // vectorize (SIMD)
         ldr     d2, [x0, x5, lsl 3]
         ldr     d3, [x6, x5, lsl 3]
-        fmadd   d1, d1, d2, d3              // w[i][j] += eta * delta[i] * x[j]
+        fmadd   d1, d0, d2, d3              // w[i][j] += eta * delta[i] * x[j]
         str     d1, [x6, x5, lsl 3]         // store w[i][j]
 
         add     x5, x5, 1

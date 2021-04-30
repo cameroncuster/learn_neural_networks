@@ -103,7 +103,7 @@ void test_vectors(double fv[][maxin+1], int numv,
     if (i == 0)
       {
       cout << "o_out: ";
-      for (j = 0; j < maxout; j++)
+      for (int j = 0; j < maxout; j++)
         cout << o_out[j] << "  ";
       cout << endl;
       }

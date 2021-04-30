@@ -103,8 +103,8 @@ network_response:
         mov     x19, x0                     // r19 = x[]
         mov     x20, x1                     // r20 = w[][]
         mov     x21, x2                     // r21 = o_out[]
-
-        mov     x22, shiftedMaxin           // const x22 = shiftedMaxin
+        mov     x22, shiftedMaxin           // const r22 = shiftedMaxin
+        fmov    d9, 1.0                     // const f9 = 1.0
 
         mov     x29, 0                      // i = 0
 forall_rows_in_output_layer:
@@ -127,12 +127,11 @@ forall_values_in_output_layer:
         fmov    d0, d8
         bl      exp
 
-        // 1 + e^(-temp)
-        fmov    d1, 1.0
-        fadd    d0, d0, d1
+        // 1.0 + e^(-temp)
+        fadd    d0, d9, d0
 
         // 1.0 / (1 + e^(-temp))
-        fdiv    d0, d1, d0
+        fdiv    d0, d9, d0
 
         // o_out[i] = 1.0 / (1 + e^(-temp))
         str     d0, [x21, x29, lsl 3]

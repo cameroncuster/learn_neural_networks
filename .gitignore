@@ -1,2 +1,6 @@
 *.out
 *.in
+percept
+percept_arm
+percept_out
+percept_arm_out

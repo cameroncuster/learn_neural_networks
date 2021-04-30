@@ -91,7 +91,6 @@ void test_vectors(double fv[][maxin+1], int numv,
   int fclass[], int desired[][maxout])
   {
   int     i;
-  int     j;
   int     net_guess;
   int     correct;
   double  o_out[maxout];

@@ -135,19 +135,35 @@ network_response:
         mov     x29, 0                      // i = 0
 forall_rows_in_output_layer:
         mov     x0, 0                       // j = 0
-        madd    x1, x22, x29, x20
+        madd    x1, x22, x29, x20           // calculate w[][] index preshifted
 
         ldr     d8, zero                    // temp = 0
 
+        // copy address
+        mov     x2, x19
+
 forall_values_in_output_row: // vectorize (SIMD)
         // accumulate the product of the weights and the x values (negated)
-        ldr     d0, [x1, x0, lsl 3]         // w[i][j]
-        ldr     d1, [x19, x0, lsl 3]        // x[j]
+        ld1     {v1.2d}, [x2], 16           // x[j] and x[j+1]
+        ld1     {v0.2d}, [x1], 16           // w[i][j] and w[i][j+1]
+        fmul    v0.2d, v0.2d, v1.2d         // vectorized w[][] * x[]
+        // sum all values in the vector and subtract from temp
+        faddp   d1, v0.2d                   // sum of all elements in vector
+        fsub    d8, d8, d1                  // temp -= sum
+
+        add     x0, x0, 2
+        cmp     x0, maxinVec
+        blt     forall_values_in_output_row // for( ; j < maxinVec; j += 2 )
+
+for_remaining_values_in_output_row: // vectorize (SIMD)
+        // accumulate the product of the weights and the x values (negated)
+        ldr     d1, [x2], 8                 // x[j]
+        ldr     d0, [x1], 8                 // w[i][j]
         fmsub   d8, d0, d1, d8              // temp -= w[i][j] * x[j]
 
         add     x0, x0, 1
         cmp     x0, maxin
-        blt     forall_values_in_output_row // for( ; j < maxin; j++ )
+        blt     for_remaining_values_in_output_row // for( ; j < maxin; j++ )
 
         // e^(-temp)
         fmov    d0, d8

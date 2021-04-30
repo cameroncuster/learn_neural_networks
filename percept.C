@@ -18,21 +18,12 @@ using namespace std;
 #include "constant.h"
 
 #define DEBUG false
-#define USE_ARM_UPDATE_WEIGHTS true
-#define USE_ARM_NETWORK_RESPONSE true
 
-// AArch64 implementations
-
-#if USE_ARM_UPDATE_WEIGHTS
 extern "C" void update_weights(double x[], double o_out[], int desired[],
         double w[maxout][maxin+1]);
-#endif
 
-#if USE_ARM_NETWORK_RESPONSE
 extern "C" void network_response(double x[maxin+1], double w[maxout][maxin+1],
         double o_out[maxout]);
-#endif
-
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -85,41 +76,6 @@ void make_expected(int fclass[], int n, int target[][maxout])
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//                function network_response                       //
-//                                                                //
-//   Calculate the responses of the hidden layer and feed         //
-//   these into the output layer.                                 //
-//                                                                //
-//   Calls : none                                                 //
-//                                                                //
-//   Called By : train                                            //
-//               test_uniform                                     //
-////////////////////////////////////////////////////////////////////
-#if ( USE_ARM_NETWORK_RESPONSE == false )
-void network_response (double x[maxin+1], double w[maxout][maxin+1], 
-                       double o_out[maxout])
-  {
-  int      i;
-  int      j;
-  double   temp;
-
-  // calculate the output layer response
-  for (i = 0; i < maxout; i++)
-    {
-    temp = 0;
-    for (j = 0; j <= maxin; j++)
-      temp += w[i][j] * x[j];
-
-    o_out[i] = 1.0 / (1 + exp(-temp));
-    }
-
-  }
-#endif
-  // network_response
-
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
 //             function test_feature_vectors                      //
 //                                                                //
 //   Test that the matrix gives the right answers for             //
@@ -135,6 +91,7 @@ void test_vectors(double fv[][maxin+1], int numv,
   int fclass[], int desired[][maxout])
   {
   int     i;
+  int     j;
   int     net_guess;
   int     correct;
   double  o_out[maxout];
@@ -297,41 +254,6 @@ void print_weights(double w[maxout][maxin+1])
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
-//               PROCEDURE update_weights                         //
-//                                                                //
-//   First update the output weights then back up through         //
-//   the nodes.                                                   //
-//                                                                //
-//   Calls : none                                                 //
-//                                                                //
-//   Called By : train                                            //
-////////////////////////////////////////////////////////////////////
-#if ( USE_ARM_UPDATE_WEIGHTS == false )
-void update_weights(double x[], double o_out[], int desired[],
-                    double w[maxout][maxin+1])
-  {
-  double    change;
-  int       i;
-  int       j;
-  double    delta[maxout];
-
-  // update the w matrix: w[i][j] = w[i][j] + eta*delta[i]*x[j]
-
-  for (i = 0; i < maxout; i++)
-    {
-    delta[i] = o_out[i] * (1 - o_out[i]) * (desired[i] - o_out[i]);
-    for (j = 0; j <= maxin; j++)
-      {
-      change = eta * delta[i] * x[j];
-      w[i][j] += change;
-      }
-    }
-   }
-#endif
-  // update_weights
-
-////////////////////////////////////////////////////////////////////
-//                                                                //
 //                  PROCEDURE find_error                          //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
@@ -449,4 +371,5 @@ int main()
 ////////////////////////////////////////////////////////////////////
 //                  END BACKPROPAGATION CODE                      //
 ////////////////////////////////////////////////////////////////////
+
 

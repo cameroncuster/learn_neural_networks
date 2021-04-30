@@ -14,9 +14,19 @@ eta:    .double 0.2
 zero:   .double 0.0
         .align  3
 
-////////////////////////////////////////////////////////////////////////////////
-//      Simple function to update the weights of first layer of the network   //
-////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+//               PROCEDURE update_weights                         //
+//                                                                //
+//   First update the output weights then back up through         //
+//   the nodes.                                                   //
+//                                                                //
+//   Calls : none                                                 //
+//                                                                //
+//   Called By : train                                            //
+////////////////////////////////////////////////////////////////////
 
         .text
         .global update_weights
@@ -66,9 +76,20 @@ forall_weights_in_row:
         ret
         .size   update_weights, (. - update_weights)
 
-////////////////////////////////////////////////////////////////////////////////
-//      response function to generate output matrix o_out                     //
-////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////
+//                                                                //
+//                function network_response                       //
+//                                                                //
+//   Calculate the responses of the hidden layer and feed         //
+//   these into the output layer.                                 //
+//                                                                //
+//   Calls : none                                                 //
+//                                                                //
+//   Called By : train                                            //
+//               test_uniform                                     //
+////////////////////////////////////////////////////////////////////
 
         .global network_response
         .type   network_respones, %function // void network_response(

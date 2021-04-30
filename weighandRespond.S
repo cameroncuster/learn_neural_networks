@@ -34,8 +34,8 @@ forall_rows_of_weights:
         scvtf   d1, w5                      // f1 = r5
 
         // calculate delta into f0
-        fmsub   d2, d0, d0, d0              // o_out - o_out^2
-        fsub    d3, d1, d0                  // desired - o_out
+        fmsub   d2, d0, d0, d0
+        fsub    d3, d1, d0
         fmul    d0, d2, d3
 
         // row address
@@ -49,8 +49,8 @@ forall_rows_of_weights:
 forall_weights_in_row:
         ldr     d1, eta
         fmul    d1, d0, d1
-        ldr     d2, [x0, x5, lsl 3]         // load x[j]
-        ldr     d3, [x6, x5, lsl 3]         // load w[i][j]
+        ldr     d2, [x0, x5, lsl 3]
+        ldr     d3, [x6, x5, lsl 3]
         fmadd   d1, d1, d2, d3              // w[i][j] += eta * delta[i] * x[j]
         str     d1, [x6, x5, lsl 3]         // store w[i][j]
 
@@ -79,9 +79,9 @@ network_response:
         stp     x19, x20, [sp, -16]!
         stp     d8, d9, [sp, -16]!
 
-        mov     x19, x0
-        mov     x20, x1
-        mov     x21, x2
+        mov     x19, x0                     // r19 = x[]
+        mov     x20, x1                     // r20 = w[][]
+        mov     x21, x2                     // r21 = o_out[]
 
         mov     x29, 0                      // i = 0
 forall_rows_in_output_layer:
@@ -94,27 +94,32 @@ forall_rows_in_output_layer:
         ldr     d8, zero                    // temp = 0
 
 forall_values_in_output_layer:
+        // accumulate the product of the weights and the x values (negated)
         ldr     d0, [x1, x0, lsl 3]         // w[i][j]
         ldr     d1, [x19, x0, lsl 3]        // x[j]
         fmsub   d8, d0, d1, d8              // temp -= w[i][j] * x[j]
 
         add     x0, x0, 1
         cmp     x0, maxin
-        blt     forall_values_in_output_layer
+        blt     forall_values_in_output_layer// for( ; j < maxin; j++ )
 
+        // e^(-temp)
         fmov    d0, d8
         bl      exp
 
+        // 1 + e^(-temp)
         fmov    d1, 1.0
         fadd    d0, d0, d1
 
+        // 1.0 / (1 + e^(-temp))
         fdiv    d0, d1, d0
 
+        // o_out[i] = 1.0 / (1 + e^(-temp))
         str     d0, [x21, x29, lsl 3]
 
         add     x29, x29, 1
         cmp     x29, maxout
-        blt     forall_rows_in_output_layer
+        blt     forall_rows_in_output_layer // for( ; i < maxout; i++ )
 
         ldp     d8, d9, [sp], 16
         ldp     x19, x20, [sp], 16

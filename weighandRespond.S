@@ -24,7 +24,8 @@ zero:   .double 0.0
 //               PROCEDURE update_weights                         //
 //                                                                //
 //   First update the output weights then back up through         //
-//   the nodes. Highly optomized for speed-ups in update.         //
+//   the nodes. Highly optomized for vectorized instructions in   //
+//   update.                                                      //
 //                                                                //
 //   Calls : none                                                 //
 //                                                                //
@@ -82,8 +83,7 @@ forall_weights_in_row:
         cmp     x5, maxinVec
         blt     forall_weights_in_row       // for( ; j < maxinVec; j += 2 )
 
-for_remaining_weights_in_row: /* slightly inefficient as it always computes the
-                                 last one/two values in the array individually */
+for_remaining_weights_in_row:
         ldr     d2, [x10], 8                // x[j]
         ldr     d3, [x6]                    // w[i][j]
         fmadd   d1, d0, d2, d3              // w[i][j] += eta * delta[i] * x[j]
@@ -108,8 +108,8 @@ for_remaining_weights_in_row: /* slightly inefficient as it always computes the
 //                function network_response                       //
 //                                                                //
 //   Calculate the responses of the hidden layer and feed         //
-//   these into the output layer. Highly optimized for speed-ups  //
-//   in response out layer.                                       //
+//   these into the output layer. Highly optimized for vectorized //
+//   instructions in response out layer.                          //
 //                                                                //
 //   Calls : none                                                 //
 //                                                                //
@@ -142,7 +142,7 @@ forall_rows_in_output_layer:
         // copy address
         mov     x2, x19
 
-forall_values_in_output_row: // vectorize (SIMD)
+forall_values_in_output_row:
         // accumulate the product of the weights and the x values (negated)
         ld1     {v1.2d}, [x2], 16           // x[j] and x[j+1]
         ld1     {v0.2d}, [x1], 16           // w[i][j] and w[i][j+1]
@@ -155,7 +155,7 @@ forall_values_in_output_row: // vectorize (SIMD)
         cmp     x0, maxinVec
         blt     forall_values_in_output_row // for( ; j < maxinVec; j += 2 )
 
-for_remaining_values_in_output_row: // vectorize (SIMD)
+for_remaining_values_in_output_row:
         // accumulate the product of the weights and the x values (negated)
         ldr     d1, [x2], 8                 // x[j]
         ldr     d0, [x1], 8                 // w[i][j]

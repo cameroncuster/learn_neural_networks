@@ -8,10 +8,10 @@ the program.
 Gradient descent optimization factor of 0.2 (eta).
 
 **Average Times**(s)
-Lang | Update Weights | Network Response | Average
--------------- | -------------- | ---------------- | -------
-C              | | | 1.28205e-05
-AArch64        | | | 6.41026e-06
+| | Update Weights | Network Response | Average |
+| -------------- | -------------- | ---------------- | ------- |
+| C              | | | 1.28205e-05 |
+| AArch64        | | | 6.41026e-06 |
 
 
 **Implementation**

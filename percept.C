@@ -19,18 +19,16 @@ using namespace std;
 
 #define DEBUG false
 
+#include <chrono>
+using namespace std::chrono;
+
 extern "C" void update_weights(double x[], double o_out[], int desired[],
         double w[maxout][maxin+1]);
 
 extern "C" void network_response(double x[maxin+1], double w[maxout][maxin+1],
         double o_out[maxout]);
 
-////////////////////////////////////////////////////////////////////
 
-float clock_seconds()
-{
-    return clock() / (float) CLOCKS_PER_SEC;
-}
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
@@ -322,17 +320,26 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
   //---------find initial error---------------
   find_error(fv, ftarget, w);
 
-  double totalTime = 0;
+  duration<double> totalTimeResponse, totalTimeWeights;
+  high_resolution_clock::time_point t1, t2;
   int iterations = 0;
+
   for (n_iter = 1; n_iter <= n_iterations; n_iter++)
     {
     for (i = 0; i < numfv; i++)
       {
-      int t1 = clock_seconds();
+      t1 = high_resolution_clock::now();
       network_response(fv[i], w, o_out);
+      t2 = high_resolution_clock::now();
+
+      totalTimeResponse += duration_cast<duration<double>>(t2 - t1);
+
+      t1 = high_resolution_clock::now();
       update_weights(fv[i], o_out, ftarget[i], w);
-      int t2 = clock_seconds();
-      totalTime += t2 - t1;
+      t2 = high_resolution_clock::now();
+
+      totalTimeWeights += duration_cast<duration<double>>(t2 - t1);
+
       iterations++;
       }
 
@@ -346,8 +353,11 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
     } // for n_iter
   results_out . close();
 
-  cout << "Average time taken by update_weights and network_response: " <<
-      totalTime / double(iterations) << endl;
+  cout <<
+      "Average time taken by update_weights: " <<
+      double(totalTimeWeights.count()) / double(iterations) << endl <<
+      "Average time taken by network_response: " <<
+      double(totalTimeResponse.count()) / double(iterations) << endl;
   }
   // train
 

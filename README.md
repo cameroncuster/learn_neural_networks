@@ -1,5 +1,4 @@
 # Perceptron Network - Cameron Custer #
-#### Weights and out response implemented in AArch64 ####
 This program constructs a single layer perceptron network where the sigmoid
 activation function ( f(x) = 1 / [1 + e^(-x)] ) is calculated. The network is
 trained with gradient descent, and tested with inputs which have not been seen
@@ -9,10 +8,9 @@ Gradient descent optimization factor of 0.2 (eta).
 
 **Average Times**(s)
 | | Update Weights | Network Response | Average |
-| -------------- | -------------- | ---------------- | ------- |
-| C              | | | 1.28205e-05 |
-| AArch64        | | | 6.41026e-06 |
-
+| - | - | - | - |
+| C | 6.3905e-06 | 5.5316e-06 | 1.28205e-05 |
+| AArch64 | 1.21388e-06 | 2.9766e-06 | 6.41026e-06 |
 
 **Implementation**
 The weight modifications and output layer response calculations are performed in

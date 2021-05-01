@@ -17,7 +17,8 @@ The weight modifications and output layer response calculations are performed in
 AArch64 assembly language with specific optimizations for efficiency such as
 vectorizing all operations for half the execution time. The network response is
 implemented in such a way that the network can effortlessly be extended for
-multiple layers, but still vectorizes instructions for a 2x speed-up.
+multiple layers, but still vectorizes instructions for a 2x speed-up as shown
+in the table above.
 
 **Testing**
 [Test script](testrun.sh) was written for the files to compile, execute,

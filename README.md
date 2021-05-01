@@ -7,12 +7,21 @@ the program.
 
 Gradient descent optimization factor of 0.2 (eta).
 
+**Average Times**(s)
+-------------- | Update Weights | Network Response | Average
+-------------- | -------------- | ---------------- | -------
+C              | -------------- | ---------------- | 1.28205e-05
+AArch64        | -------------- | ---------------- | 6.41026e-06
+
+
+**Implementation**
 The weight modifications and output layer response calculations are performed in
 AArch64 assembly language with specific optimizations for efficiency such as
 vectorizing all operations for twice the execution time. The network response is
 implemented in such a way that the network can effortlessly be extended for
 multiple layers, but still vectorizes instructions for a 2x speed-up.
 
+**Testing**
 [Test script](testrun.sh) was written for the files to compiles, execute,
 collect, and diff the output. This allowed for continuous integration (CI) and
 development (CD).

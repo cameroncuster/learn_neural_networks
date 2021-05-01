@@ -26,6 +26,13 @@ extern "C" void network_response(double x[maxin+1], double w[maxout][maxin+1],
         double o_out[maxout]);
 
 ////////////////////////////////////////////////////////////////////
+
+float clock_seconds()
+{
+    return clock() / (float) CLOCKS_PER_SEC;
+}
+
+////////////////////////////////////////////////////////////////////
 //                                                                //
 //              function classify                                 //
 //              pick biggest entry in output vector               //
@@ -315,12 +322,18 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
   //---------find initial error---------------
   find_error(fv, ftarget, w);
 
+  double totalTime = 0;
+  int iterations = 0;
   for (n_iter = 1; n_iter <= n_iterations; n_iter++)
     {
     for (i = 0; i < numfv; i++)
       {
+      int t1 = clock_seconds();
       network_response(fv[i], w, o_out);
       update_weights(fv[i], o_out, ftarget[i], w);
+      int t2 = clock_seconds();
+      totalTime += t2 - t1;
+      iterations++;
       }
 
     if ((n_iter % log_mod == 0) || (n_iter == n_iterations))
@@ -332,6 +345,9 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
       }
     } // for n_iter
   results_out . close();
+
+  cout << "Average time taken by update_weights and network_response: " <<
+      totalTime / double(iterations) << endl;
   }
   // train
 

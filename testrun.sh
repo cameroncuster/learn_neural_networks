@@ -12,4 +12,4 @@ g++ -o percept_arm percept.C weighandRespond.S -Wall
 diff -q percept_out percept_arm_out
 
 # clean-up
-rm percept percept_arm percept_out percept_arm_out
+#rm percept percept_arm percept_out percept_arm_out

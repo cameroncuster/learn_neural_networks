@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # compile
-g++ -o percept percept.C weighandRespond.C -Wall
-g++ -o percept_arm percept.C weighandRespond.S -Wall
+g++ -o percept percept.C update_weights.C network_response.C -Wall
+g++ -o percept_arm percept.C update_weights.S network_response.S -Wall
 
 # collect out
 ./percept > percept_out

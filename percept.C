@@ -18,7 +18,9 @@ using namespace std;
 #include "constant.h"
 
 #define DEBUG false
+#define CLOCK false
 
+// Include for clocking update_weights and network_response
 #include <chrono>
 using namespace std::chrono;
 
@@ -27,7 +29,6 @@ extern "C" void update_weights(double x[], double o_out[], int desired[],
 
 extern "C" void network_response(double x[maxin+1], double w[maxout][maxin+1],
         double o_out[maxout]);
-
 
 
 ////////////////////////////////////////////////////////////////////
@@ -352,12 +353,13 @@ void train_vectors(double fv[numfv][maxin+1], int fclass[maxout],
       }
     } // for n_iter
   results_out . close();
-
-  cout <<
+#if CLOCK
+  cout << endl <<
       "Average time taken by update_weights: " <<
       double(totalTimeWeights.count()) / double(iterations) << endl <<
       "Average time taken by network_response: " <<
-      double(totalTimeResponse.count()) / double(iterations) << endl;
+      double(totalTimeResponse.count()) / double(iterations) << endl << endl;
+#endif
   }
   // train
 

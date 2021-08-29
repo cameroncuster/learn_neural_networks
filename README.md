@@ -1,4 +1,4 @@
-# Perceptron Network - Cameron Custer #
+# Perceptron Network
 This program constructs a single layer perceptron network where the sigmoid
 activation function ( f(x) = 1 / [1 + e^(-x)] ) is calculated. The network is
 trained with gradient descent, and tested with inputs which have not been seen
